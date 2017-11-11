@@ -12,6 +12,7 @@ const history = createHistory();
 export default class Controller extends Component {
   static propTypes = {
     children: PropTypes.node,
+    slides: PropTypes.node,
     history: PropTypes.object,
     store: PropTypes.object,
     theme: PropTypes.object,
@@ -30,7 +31,7 @@ export default class Controller extends Component {
   componentDidMount() {
     this.unlisten = this.history.listen(this._updateRoute.bind(this));
     const location = this.history.location;
-    const slideCount = countSlides(this.props.children.props.children);
+    const slideCount = countSlides(this.props.slides);
     this.props.store.dispatch(
       updateRoute({
         location,
@@ -53,7 +54,7 @@ export default class Controller extends Component {
         print: location.search.indexOf('print') !== -1,
       },
       () => {
-        const slideCount = countSlides(this.props.children.props.children);
+        const slideCount = countSlides(this.props.slides);
         this.props.store.dispatch(
           updateRoute({
             location,

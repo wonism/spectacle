@@ -1,6 +1,7 @@
 /* eslint-disable no-invalid-this, max-statements */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import isUndefined from 'lodash/isUndefined';
 import isFunction from 'lodash/isFunction';
 import { getStyles } from '../utils/base';
@@ -307,3 +308,15 @@ Slide.childContextTypes = {
 };
 
 export default Slide;
+
+/*
+export default connect(state => ({
+  fragments: state.fragment,
+  export: state.route.params.indexOf('export') !== -1,
+  print: state.route.params.indexOf('print') !== -1,
+  hash: state.route.slide,
+  transition: ["slide"], // TODO: Put in Redux
+  transitionDuration: 500, // TODO: Put in Redux
+
+}), null, null)(Slide);
+*/

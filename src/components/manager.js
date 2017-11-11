@@ -19,7 +19,6 @@ import memoize from 'lodash/memoize';
 import Presenter from './presenter';
 import Export from './export';
 import Overview from './overview';
-import Magic from './magic';
 
 import AutoplayControls from './autoplay-controls';
 import Fullscreen from './fullscreen';
@@ -64,6 +63,7 @@ export class Manager extends Component {
     autoplayDuration: 7000,
     contentWidth: 1000,
     contentHeight: 700,
+    slideReference: [],
     transition: [],
     transitionDuration: 500,
     progress: 'pacman',
@@ -80,6 +80,7 @@ export class Manager extends Component {
     controls: PropTypes.bool,
     dispatch: PropTypes.func,
     fragment: PropTypes.object,
+    slideReference: PropTypes.array,
     globalStyles: PropTypes.bool,
     progress: PropTypes.oneOf(['pacman', 'bar', 'number', 'none']),
     route: PropTypes.object,
@@ -112,9 +113,9 @@ export class Manager extends Component {
     this._goToSlide = this._goToSlide.bind(this);
     this._startAutoplay = this._startAutoplay.bind(this);
     this._stopAutoplay = this._stopAutoplay.bind(this);
+
     this.state = {
       lastSlideIndex: null,
-      slideReference: [],
       fullscreen: window.innerHeight === screen.height,
       mobile: window.innerWidth < props.contentWidth,
       autoplaying: props.autoplay,
@@ -130,12 +131,6 @@ export class Manager extends Component {
     };
   }
 
-  componentWillMount() {
-    this.setState({
-      slideReference: this._buildSlideReference(this.props),
-    });
-  }
-
   componentDidMount() {
     const slideIndex = this._getSlideIndex();
     this.setState({
@@ -145,12 +140,6 @@ export class Manager extends Component {
     if (this.props.autoplay) {
       this._startAutoplay();
     }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      slideReference: this._buildSlideReference(nextProps),
-    });
   }
 
   componentDidUpdate() {
@@ -299,7 +288,7 @@ export class Manager extends Component {
       offset = 1;
 
       const index = isNaN(parseInt(data.slide, 10)) ?
-        get(this.state.slideReference.find(slide => slide.id === data.slide), 'rootIndex', 0) :
+        get(this.props.slideReference.find(slide => slide.id === data.slide), 'rootIndex', 0) :
         data.slide - 1;
 
       localStorage.setItem(
@@ -364,11 +353,11 @@ export class Manager extends Component {
     const sortedIndexes = Array.from(this.viewedIndexes).sort((a, b) => a - b);
     return Math.min(
       (sortedIndexes[sortedIndexes.length - 1] || 0) + 1,
-      this.state.slideReference.length - 1
+      this.props.slideReference.length - 1
     );
   }
   _getOffset(slideIndex) {
-    const { goTo } = this.state.slideReference[slideIndex];
+    const { goTo } = this.props.slideReference[slideIndex];
     const nextUnviewedIndex = this._nextUnviewedIndex();
     if (goTo && !isNaN(parseInt(goTo))) {
       const goToIndex = () => {
@@ -386,7 +375,7 @@ export class Manager extends Component {
     this.setState({
       lastSlideIndex: slideIndex,
     });
-    const slideReference = this.state.slideReference;
+    const slideReference = this.props.slideReference;
     if (
       this._checkFragments(this.props.route.slide, true) ||
       this.props.route.params.indexOf('overview') !== -1
@@ -424,7 +413,7 @@ export class Manager extends Component {
     }
   }
   _getHash(slideIndex) {
-    return this.state.slideReference[slideIndex].id;
+    return this.props.slideReference[slideIndex].id;
   }
   _checkFragments(slide, forward) {
     const state = this.context.store.getState();
@@ -557,49 +546,10 @@ export class Manager extends Component {
 
     return 0;
   }
-  _buildSlideReference(props) {
-    const slideReference = [];
-    Children.toArray(props.children).forEach((child, rootIndex) => {
-      if (child.type === Magic) {
-        Children.toArray(
-          child.props.children
-        ).forEach((setSlide, magicIndex) => {
-          const reference = {
-            id: setSlide.props.id || slideReference.length,
-            magicIndex,
-            rootIndex,
-          };
-          slideReference.push(reference);
-        });
-      } else if (!child.props.hasSlideChildren) {
-        const reference = {
-          id: child.props.id || slideReference.length,
-          rootIndex,
-        };
-        if (child.props.goTo) {
-          reference.goTo = child.props.goTo;
-        }
-        slideReference.push(reference);
-      } else {
-        child.props.children.forEach((setSlide, setIndex) => {
-          const reference = {
-            id: setSlide.props.id || slideReference.length,
-            setIndex,
-            rootIndex,
-          };
-          if (child.props.goTo) {
-            reference.goTo = child.props.goTo;
-          }
-          slideReference.push(reference);
-        });
-      }
-    });
-    return slideReference;
-  }
   _getSlideIndex() {
     let index = parseInt(this.props.route.slide);
     if (!Number.isFinite(index)) {
-      const foundIndex = findIndex(this.state.slideReference, reference => {
+      const foundIndex = findIndex(this.props.slideReference, reference => {
         return this.props.route.slide === reference.id;
       });
       index = foundIndex >= 0 ? foundIndex : 0;
@@ -609,7 +559,7 @@ export class Manager extends Component {
   _getSlideByIndex(index) {
     return getSlideByIndex(
       this.props.children,
-      this.state.slideReference,
+      this.props.slideReference,
       index
     );
   }
@@ -631,7 +581,7 @@ export class Manager extends Component {
       transitionDuration: (slide.props.transition || {}).transitionDuration
         ? slide.props.transitionDuration
         : this.props.transitionDuration,
-      slideReference: this.state.slideReference,
+      slideReference: this.props.slideReference,
     });
   }
   render() {
@@ -725,7 +675,7 @@ export class Manager extends Component {
           showControls && (
             <Controls
               currentSlideIndex={this._getSlideIndex()}
-              totalSlides={this.state.slideReference.length}
+              totalSlides={this.props.slideReference.length}
               onPrev={this._prevSlide.bind(this)}
               onNext={this._nextSlide.bind(this)}
             />
@@ -737,7 +687,7 @@ export class Manager extends Component {
         {this.props.route.params.indexOf('export') === -1 &&
         this.props.route.params.indexOf('overview') === -1 ? (
           <Progress
-            items={this.state.slideReference}
+            items={this.props.slideReference}
             currentSlideIndex={this._getSlideIndex()}
             type={this.props.progress}
           />

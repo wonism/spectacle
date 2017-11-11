@@ -6,6 +6,7 @@ import configureStore from '../store';
 
 import Controller from '../utils/controller';
 import Manager from './manager';
+import SlideReference from './manager/slide-reference';
 
 const store = configureStore();
 
@@ -32,8 +33,11 @@ export default class Deck extends Component {
           theme={this.props.theme}
           store={store}
           history={this.props.history}
+          slides={this.props.children}
         >
-          <Manager {...this.props}>{this.props.children}</Manager>
+          <SlideReference slides={this.props.children}>
+            <Manager {...this.props} slides={this.props.children} />
+          </SlideReference>
         </Controller>
       </Provider>
     );
