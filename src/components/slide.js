@@ -7,6 +7,7 @@ import isFunction from 'lodash/isFunction';
 import { getStyles } from '../utils/base';
 import { addFragment } from '../actions';
 import stepCounter from '../utils/step-counter';
+import { getSlideIndex } from '../utils/slides';
 import {
   SlideContainer,
   SlideContent,
@@ -15,7 +16,7 @@ import {
 import { VictoryAnimation } from 'victory-core';
 import findIndex from 'lodash/findIndex';
 
-class Slide extends React.PureComponent {
+export class Slide extends React.PureComponent {
   state = {
     contentScale: 1,
     reverse: false,
@@ -307,16 +308,14 @@ Slide.childContextTypes = {
   }),
 };
 
-export default Slide;
-
-/*
 export default connect(state => ({
   fragments: state.fragment,
   export: state.route.params.indexOf('export') !== -1,
   print: state.route.params.indexOf('print') !== -1,
   hash: state.route.slide,
-  transition: ["slide"], // TODO: Put in Redux
+  slideIndex: getSlideIndex(state, state.route.slide),
+  lastSlideIndex: getSlideIndex(state, state.route.lastSlide),
+  transition: ['zoom', 'slide'], // TODO: Put in Redux
   transitionDuration: 500, // TODO: Put in Redux
-
-}), null, null)(Slide);
-*/
+  slideReference: state.slideReference
+}), null, null, { withRef: true })(Slide);

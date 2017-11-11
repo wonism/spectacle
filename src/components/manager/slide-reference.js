@@ -49,8 +49,8 @@ const build = childrenArr => {
 class SlideReference extends Component {
   static propTypes = {
     children: PropTypes.node,
-    slides: PropTypes.node,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    slides: PropTypes.node
   };
 
   componentWillMount() {

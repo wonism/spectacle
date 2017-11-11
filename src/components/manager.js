@@ -1,17 +1,16 @@
 /*eslint new-cap:0, max-statements:0*/
 /* eslint react/no-did-mount-set-state: 0 */
 
-import React, { Children, cloneElement, Component } from 'react';
+import React, { Children, Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactTransitionGroup from 'react-transition-group/TransitionGroup';
 import filter from 'lodash/filter';
 import size from 'lodash/size';
-import findIndex from 'lodash/findIndex';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { setGlobalStyle, updateFragment } from '../actions';
 import Typeface from './typeface';
-import { getSlideByIndex } from '../utils/slides';
+import { getSlideIndex, getSlideByIndex } from '../utils/slides';
 import styled from 'react-emotion';
 import { string as toStringStyle } from 'to-style';
 import memoize from 'lodash/memoize';
@@ -547,14 +546,7 @@ export class Manager extends Component {
     return 0;
   }
   _getSlideIndex() {
-    let index = parseInt(this.props.route.slide);
-    if (!Number.isFinite(index)) {
-      const foundIndex = findIndex(this.props.slideReference, reference => {
-        return this.props.route.slide === reference.id;
-      });
-      index = foundIndex >= 0 ? foundIndex : 0;
-    }
-    return index;
+    return getSlideIndex(this.props, this.props.route.slide);
   }
   _getSlideByIndex(index) {
     return getSlideByIndex(
@@ -565,24 +557,7 @@ export class Manager extends Component {
   }
   _renderSlide() {
     const slideIndex = this._getSlideIndex();
-    const slide = this._getSlideByIndex(slideIndex);
-
-    return cloneElement(slide, {
-      dispatch: this.props.dispatch,
-      fragments: this.props.fragment,
-      export: this.props.route.params.indexOf('export') !== -1,
-      print: this.props.route.params.indexOf('print') !== -1,
-      hash: this.props.route.slide,
-      slideIndex,
-      lastSlideIndex: this.state.lastSlideIndex,
-      transition: (slide.props.transition || {}).length
-        ? slide.props.transition
-        : this.props.transition,
-      transitionDuration: (slide.props.transition || {}).transitionDuration
-        ? slide.props.transitionDuration
-        : this.props.transitionDuration,
-      slideReference: this.props.slideReference,
-    });
+    return this._getSlideByIndex(slideIndex);
   }
   render() {
     if (this.props.route.slide === null) {

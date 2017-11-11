@@ -22,12 +22,13 @@ const reducer = handleActions(
         {},
         {
           slide,
+          lastSlide: state.slide,
           params: location.search.replace('?', '').split('&'),
         }
       );
     },
   },
-  { slide: null, params: [] }
+  { slide: null, lastSlide: null, params: [] }
 );
 
 export default reducer;

@@ -1,5 +1,6 @@
 import { cloneElement, Children } from 'react';
 import isUndefined from 'lodash/isUndefined';
+import findIndex from 'lodash/findIndex';
 import reduce from 'lodash/reduce';
 
 export const getSlideByIndex = (children, slideReference, index) => {
@@ -44,4 +45,19 @@ export const countSlides = children => {
     },
     0
   );
+};
+
+export const getSlideIndex = (state, slide) => {
+  if (slide === null) {
+    return null;
+  }
+
+  let index = parseInt(slide, 10);
+  if (!Number.isFinite(index)) {
+    const foundIndex = findIndex(state.slideReference, reference => {
+      return slide === reference.id;
+    });
+    index = foundIndex >= 0 ? foundIndex : 0;
+  }
+  return index;
 };
