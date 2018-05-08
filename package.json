@@ -24,7 +24,7 @@
     "build:publish": "npm run clean && npm run build",
     "lint": "eslint src example *.js",
     "prettier-check": "lint-staged",
-    "prettier": "prettier",
+    "prettier": "cat .gitignore .prettierignore > .gitprettierignore && prettier --write --config .prettierrc \"**/*.{js,scss,json}\" --ignore-path .gitprettierignore",
     "deploy": "npm run build:dist && surge -p .",
     "start": "builder run --env \"{\\\"BABEL_ENV\\\":\\\"esm\\\"}\" build-wds-base -- --port=3000 --hot",
     "test": "jest --verbose",
