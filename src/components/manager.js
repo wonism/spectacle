@@ -48,14 +48,14 @@ const StyledDeck = styled.div(props => ({
   top: 0,
   left: 0,
   width: '100%',
-  height: '100%',
+  height: '100%'
 }));
 
 const StyledTransition = styled(ReactTransitionGroup)({
   height: '100%',
   width: '100%',
   perspective: 1000,
-  transformStyle: 'flat',
+  transformStyle: 'flat'
 });
 
 export class Manager extends Component {
@@ -70,7 +70,7 @@ export class Manager extends Component {
     transitionDuration: 500,
     progress: 'pacman',
     controls: true,
-    globalStyles: true,
+    globalStyles: true
   };
 
   static propTypes = {
@@ -86,7 +86,7 @@ export class Manager extends Component {
     progress: PropTypes.oneOf(['pacman', 'bar', 'number', 'none']),
     route: PropTypes.object,
     transition: PropTypes.array,
-    transitionDuration: PropTypes.number,
+    transitionDuration: PropTypes.number
   };
 
   static contextTypes = {
@@ -97,7 +97,7 @@ export class Manager extends Component {
     export: PropTypes.bool,
     overview: PropTypes.bool,
     store: PropTypes.object,
-    slide: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    slide: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
   };
 
   static childContextTypes = {
@@ -122,7 +122,7 @@ export class Manager extends Component {
       slideReference: [],
       fullscreen: window.innerHeight === screen.height,
       mobile: window.innerWidth < props.contentWidth,
-      autoplaying: props.autoplay,
+      autoplaying: props.autoplay
     };
 
     this.viewedIndexes = new Set();
@@ -139,14 +139,14 @@ export class Manager extends Component {
 
   componentWillMount() {
     this.setState({
-      slideReference: this._buildSlideReference(this.props),
+      slideReference: this._buildSlideReference(this.props)
     });
   }
 
   componentDidMount() {
     const slideIndex = this._getSlideIndex();
     this.setState({
-      lastSlideIndex: slideIndex,
+      lastSlideIndex: slideIndex
     });
     this._attachEvents();
     if (this.props.autoplay) {
@@ -156,7 +156,7 @@ export class Manager extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      slideReference: this._buildSlideReference(nextProps),
+      slideReference: this._buildSlideReference(nextProps)
     });
   }
 
@@ -173,7 +173,7 @@ export class Manager extends Component {
   }
 
   _attachEvents() {
-    wsync.receiveHandler = (msg) => {
+    wsync.receiveHandler = msg => {
       this._goToSlide({
         key: 'spectacle-slide',
         newValue: msg.data
@@ -267,7 +267,7 @@ export class Manager extends Component {
   _handleScreenChange() {
     this.setState({
       fullscreen: window.innerHeight === screen.height,
-      mobile: window.innerWidth < this.props.contentWidth,
+      mobile: window.innerWidth < this.props.contentWidth
     });
   }
   _toggleOverviewMode() {
@@ -308,23 +308,28 @@ export class Manager extends Component {
       data = e;
       offset = 1;
 
-      const index = isNaN(parseInt(data.slide, 10)) ?
-        get(this.state.slideReference.find(slide => slide.id === data.slide), 'rootIndex', 0) :
-        data.slide - 1;
+      const index = isNaN(parseInt(data.slide, 10))
+        ? get(
+            this.state.slideReference.find(slide => slide.id === data.slide),
+            'rootIndex',
+            0
+          )
+        : data.slide - 1;
 
       wsync.send(
         JSON.stringify({
           slide: this._getHash(index),
           forward: false,
           time: Date.now()
-        }));
+        })
+      );
     } else {
       return;
     }
     const slideIndex = this._getSlideIndex();
 
     this.setState({
-      lastSlideIndex: slideIndex || 0,
+      lastSlideIndex: slideIndex || 0
     });
     if (canNavigate) {
       let slide = data.slide;
@@ -337,7 +342,7 @@ export class Manager extends Component {
   _prevSlide() {
     const slideIndex = this._getSlideIndex();
     this.setState({
-      lastSlideIndex: slideIndex,
+      lastSlideIndex: slideIndex
     });
     this.viewedIndexes.delete(slideIndex);
     if (
@@ -349,11 +354,12 @@ export class Manager extends Component {
           `/${this._getHash(slideIndex - 1)}${this._getSuffix()}`
         );
         wsync.send(
-        JSON.stringify({
-          slide: this._getHash(slideIndex - 1),
-          forward: false,
-          time: Date.now()
-        }));
+          JSON.stringify({
+            slide: this._getHash(slideIndex - 1),
+            forward: false,
+            time: Date.now()
+          })
+        );
       }
     } else if (slideIndex > 0) {
       wsync.send(
@@ -361,7 +367,8 @@ export class Manager extends Component {
           slide: this._getHash(slideIndex),
           forward: false,
           time: Date.now()
-        }));
+        })
+      );
     }
   }
   _nextUnviewedIndex() {
@@ -388,7 +395,7 @@ export class Manager extends Component {
   _nextSlide() {
     const slideIndex = this._getSlideIndex();
     this.setState({
-      lastSlideIndex: slideIndex,
+      lastSlideIndex: slideIndex
     });
     const slideReference = this.state.slideReference;
     if (
@@ -408,11 +415,12 @@ export class Manager extends Component {
           `/${this._getHash(slideIndex + offset) + this._getSuffix()}`
         );
         wsync.send(
-        JSON.stringify({
-          slide: this._getHash(slideIndex + offset),
-          forward: true,
-          time: Date.now()
-        }));
+          JSON.stringify({
+            slide: this._getHash(slideIndex + offset),
+            forward: true,
+            time: Date.now()
+          })
+        );
       }
     } else if (slideIndex < slideReference.length) {
       wsync.send(
@@ -420,7 +428,8 @@ export class Manager extends Component {
           slide: this._getHash(slideIndex),
           forward: true,
           time: Date.now()
-        }));
+        })
+      );
     }
   }
   _getHash(slideIndex) {
@@ -447,9 +456,8 @@ export class Manager extends Component {
     if (slide in fragments) {
       const currentSlideFragments = fragments[slide];
       const count = size(currentSlideFragments);
-      const fullyAnimated = filter(
-        currentSlideFragments,
-        frag => frag.animations.every(anim => anim === true)
+      const fullyAnimated = filter(currentSlideFragments, frag =>
+        frag.animations.every(anim => anim === true)
       );
       const notFullyAnimated = filter(
         currentSlideFragments,
@@ -470,16 +478,22 @@ export class Manager extends Component {
       if (forward === false) {
         if (
           notFullyAnimated.length === count &&
-          notFullyAnimated.every(frag => frag.animations.every(anim => anim === false))
+          notFullyAnimated.every(frag =>
+            frag.animations.every(anim => anim === false)
+          )
         ) {
           // If every fragment is animated back to square one, then switch slides
           return true;
         }
 
         let target;
-        const lastFullyAnimatedFragment = fullyAnimated[size(fullyAnimated) - 1];
+        const lastFullyAnimatedFragment =
+          fullyAnimated[size(fullyAnimated) - 1];
         const lastNotFullyAnimatedFragment = notFullyAnimated[0];
-        if (fullyAnimated.length === count || lastNotFullyAnimatedFragment.animations.every(a => a === false)) {
+        if (
+          fullyAnimated.length === count ||
+          lastNotFullyAnimatedFragment.animations.every(a => a === false)
+        ) {
           // if all fragments are fully animated, target the last fully animated fragment
           target = lastFullyAnimatedFragment;
         } else if (notFullyAnimated !== count) {
@@ -490,7 +504,7 @@ export class Manager extends Component {
         this.props.dispatch(
           this._updateFragment({
             fragment: target,
-            animations: target.animations,
+            animations: target.animations
           })
         );
         return false;
@@ -507,7 +521,7 @@ export class Manager extends Component {
       onTouchStart(e) {
         self.touchObject = {
           startX: e.touches[0].pageX,
-          startY: e.touches[0].pageY,
+          startY: e.touches[0].pageY
         };
       },
       onTouchMove(e) {
@@ -515,7 +529,7 @@ export class Manager extends Component {
           x1: self.touchObject.startX,
           x2: e.touches[0].pageX,
           y1: self.touchObject.startY,
-          y2: e.touches[0].pageY,
+          y2: e.touches[0].pageY
         });
 
         self.touchObject = {
@@ -526,7 +540,7 @@ export class Manager extends Component {
           length: Math.round(
             Math.sqrt(Math.pow(e.touches[0].pageX - self.touchObject.startX, 2))
           ),
-          direction,
+          direction
         };
 
         if (direction !== 0) {
@@ -538,7 +552,7 @@ export class Manager extends Component {
       },
       onTouchCancel(e) {
         self._handleSwipe(e);
-      },
+      }
     };
   }
   handleClick(e) {
@@ -593,20 +607,20 @@ export class Manager extends Component {
     const slideReference = [];
     Children.toArray(props.children).forEach((child, rootIndex) => {
       if (child.type === Magic) {
-        Children.toArray(
-          child.props.children
-        ).forEach((setSlide, magicIndex) => {
-          const reference = {
-            id: setSlide.props.id || slideReference.length,
-            magicIndex,
-            rootIndex,
-          };
-          slideReference.push(reference);
-        });
+        Children.toArray(child.props.children).forEach(
+          (setSlide, magicIndex) => {
+            const reference = {
+              id: setSlide.props.id || slideReference.length,
+              magicIndex,
+              rootIndex
+            };
+            slideReference.push(reference);
+          }
+        );
       } else if (!child.props.hasSlideChildren) {
         const reference = {
           id: child.props.id || slideReference.length,
-          rootIndex,
+          rootIndex
         };
         if (child.props.goTo) {
           reference.goTo = child.props.goTo;
@@ -617,7 +631,7 @@ export class Manager extends Component {
           const reference = {
             id: setSlide.props.id || slideReference.length,
             setIndex,
-            rootIndex,
+            rootIndex
           };
           if (child.props.goTo) {
             reference.goTo = child.props.goTo;
@@ -663,7 +677,7 @@ export class Manager extends Component {
       transitionDuration: (slide.props.transition || {}).transitionDuration
         ? slide.props.transitionDuration
         : this.props.transitionDuration,
-      slideReference: this.state.slideReference,
+      slideReference: this.state.slideReference
     });
   }
   _getProgressStyles() {
@@ -695,16 +709,16 @@ export class Manager extends Component {
             body: Object.assign(this.context.styles.global.body, {
               minWidth: this.props.contentWidth + 150,
               minHeight: this.props.contentHeight + 150,
-              overflow: 'auto',
+              overflow: 'auto'
             }),
             '.spectacle-presenter-next .fragment': {
-              display: 'none !important',
-            },
+              display: 'none !important'
+            }
           }
         : {
             '.spectacle-presenter-next .fragment': {
-              display: 'none !important',
-            },
+              display: 'none !important'
+            }
           };
 
     let componentToRender;
@@ -814,7 +828,7 @@ export class Manager extends Component {
             dangerouslySetInnerHTML={{
               __html: convertStyle(
                 Object.assign({}, this.context.styles.global, globals)
-              ),
+              )
             }}
           />
         )}

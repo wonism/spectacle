@@ -10,7 +10,7 @@ const FitText = styled.div(({ height, styles }) => [
     display: 'block',
     width: '100%',
     height
-  },
+  }
 ]);
 
 const FitTextContent = styled.span(({ lineHeight, scale, styles }) => [
@@ -62,8 +62,8 @@ export default class Text extends Component {
       const text = this.textRef;
       const container = this.containerRef;
       text.style.display = 'inline-block';
-      const scale = (container.offsetWidth / text.offsetWidth);
-      const height = (text.offsetHeight * scale) || 0;
+      const scale = container.offsetWidth / text.offsetWidth;
+      const height = text.offsetHeight * scale || 0;
       text.style.display = 'block';
       this.setState({
         scale,
@@ -74,39 +74,41 @@ export default class Text extends Component {
   render() {
     const { lineHeight, fit, style, children } = this.props;
     const typefaceStyle = this.context.typeface || {};
-    return (
-      fit ? (
-        <FitText
-          className={this.props.className}
-          innerRef={(c) => { this.containerRef = c; }}
-          height={this.state.height}
-          styles={{
-            context: this.context.styles.components.text,
-            base: getStyles.call(this)
+    return fit ? (
+      <FitText
+        className={this.props.className}
+        innerRef={c => {
+          this.containerRef = c;
+        }}
+        height={this.state.height}
+        styles={{
+          context: this.context.styles.components.text,
+          base: getStyles.call(this)
+        }}
+      >
+        <FitTextContent
+          innerRef={t => {
+            this.textRef = t;
           }}
-        >
-          <FitTextContent
-            innerRef={(t) => { this.textRef = t; }}
-            lineHeight={lineHeight}
-            scale={this.state.scale}
-            styles={{ user: style, typeface: typefaceStyle }}
-          >
-            {children}
-          </FitTextContent>
-        </FitText>
-      ) : (
-        <UnfitText
-          className={this.props.className}
-          styles={{
-            context: this.context.styles.components.text,
-            base: getStyles.call(this),
-            typeface: typefaceStyle,
-            user: style
-          }}
+          lineHeight={lineHeight}
+          scale={this.state.scale}
+          styles={{ user: style, typeface: typefaceStyle }}
         >
           {children}
-        </UnfitText>
-      )
+        </FitTextContent>
+      </FitText>
+    ) : (
+      <UnfitText
+        className={this.props.className}
+        styles={{
+          context: this.context.styles.components.text,
+          base: getStyles.call(this),
+          typeface: typefaceStyle,
+          user: style
+        }}
+      >
+        {children}
+      </UnfitText>
     );
   }
 }

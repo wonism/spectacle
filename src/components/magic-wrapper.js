@@ -11,7 +11,7 @@ const Deck = styled.div(() => ({
   top: 0,
   left: 0,
   width: '100%',
-  height: '100%',
+  height: '100%'
 }));
 
 class Context extends Component {
@@ -22,7 +22,7 @@ class Context extends Component {
     overview: PropTypes.bool,
     print: PropTypes.bool,
     store: PropTypes.object,
-    styles: PropTypes.object,
+    styles: PropTypes.object
   };
   static childContextTypes = {
     contentHeight: PropTypes.number,
@@ -31,11 +31,11 @@ class Context extends Component {
     overview: PropTypes.bool,
     print: PropTypes.bool,
     store: PropTypes.object,
-    styles: PropTypes.object,
+    styles: PropTypes.object
   };
   static propTypes = {
     children: PropTypes.node,
-    context: PropTypes.object,
+    context: PropTypes.object
   };
   getChildContext() {
     return {
@@ -45,7 +45,7 @@ class Context extends Component {
       overview: this.props.context.overview,
       print: this.props.context.print,
       store: this.props.context.store,
-      styles: this.props.context.styles,
+      styles: this.props.context.styles
     };
   }
   render() {
@@ -61,7 +61,7 @@ export default class MagicText extends Component {
     overview: PropTypes.bool,
     print: PropTypes.bool,
     store: PropTypes.object,
-    styles: PropTypes.object,
+    styles: PropTypes.object
   };
   static propTypes = {
     children: PropTypes.node,
@@ -79,7 +79,7 @@ export default class MagicText extends Component {
     this.lastDiffs = null;
     this.makePortal = this.makePortal.bind(this);
     this.state = {
-      renderedChildren: props.children,
+      renderedChildren: props.children
     };
   }
   componentDidMount() {
@@ -88,12 +88,12 @@ export default class MagicText extends Component {
     if (!this.props.presenter) {
       this.container.animate([{ opacity: 0 }, { opacity: 1 }], {
         duration: 500,
-        easing: 'ease-in',
+        easing: 'ease-in'
       });
       this.props.exitSubscription(() => {
         this.container.animate([{ opacity: 1 }, { opacity: 0 }], {
           duration: 500,
-          easing: 'ease-in',
+          easing: 'ease-in'
         });
       });
     }
@@ -112,10 +112,7 @@ export default class MagicText extends Component {
           if (containerRoot && portalRoot) {
             updateChildren(containerRoot);
             updateChildren(portalRoot);
-            buildStyleMap(
-              this.portalMap,
-              portalRoot
-            );
+            buildStyleMap(this.portalMap, portalRoot);
           }
         }, 300);
       }
@@ -142,7 +139,7 @@ export default class MagicText extends Component {
           if (this.mounted) {
             this.setState(
               {
-                renderedChildren: nextProps.children,
+                renderedChildren: nextProps.children
               },
               () => {
                 this.forceUpdate();
@@ -167,7 +164,7 @@ export default class MagicText extends Component {
         if (el) {
           el.animate([{ opacity: 0 }, { opacity: 1 }], {
             duration: 500,
-            easing: 'ease-in',
+            easing: 'ease-in'
           });
         }
       });
@@ -176,10 +173,10 @@ export default class MagicText extends Component {
       Object.keys(this.diffs.updated).forEach(m => {
         const props = {
           ...(this.diffs.added[m] || {}),
-          ...(this.diffs.updated[m] || {}),
+          ...(this.diffs.updated[m] || {})
         };
         const last = {
-          ...(this.lastPortalMap[m] || {}),
+          ...(this.lastPortalMap[m] || {})
         };
         if (last) {
           const start = {};
@@ -192,7 +189,7 @@ export default class MagicText extends Component {
           if (el && !el.classList.contains('spectacle-content')) {
             el.animate([start, end], {
               duration: 500,
-              easing: 'ease-in',
+              easing: 'ease-in'
             });
           }
         }
@@ -221,7 +218,7 @@ export default class MagicText extends Component {
       <div
         style={{
           height: '100%',
-          width: '100%',
+          width: '100%'
         }}
         ref={c => {
           this.container = c;
